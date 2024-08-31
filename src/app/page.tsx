@@ -32,6 +32,7 @@ const PokemonSearch: React.FC = () => {
   }, [searchParams, getPokemon]);
 
   return (
+    <React.Suspense fallback={<div>Loading...</div>}>
     <div
       style={{
         display: "flex",
@@ -173,6 +174,7 @@ const PokemonSearch: React.FC = () => {
         </div>
       )}
     </div>
+    </React.Suspense>
   );
 };
 
