@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { usePokemonQuery } from "./query/pokemon"; // Adjust path if necessary
+import { usePokemonQuery } from "./query/pokemon";
 
 const PokemonSearch: React.FC = () => {
   const router = useRouter();
@@ -13,7 +13,6 @@ const PokemonSearch: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (pokemonName) {
-      // Update URL query parameter
       router.push(`/?name=${pokemonName}`);
     }
   };
@@ -24,14 +23,13 @@ const PokemonSearch: React.FC = () => {
   };
 
   useEffect(() => {
-    // Get the current query parameter from the URL
     const name = searchParams.get("name");
 
     if (name) {
       setPokemonName(name);
       getPokemon({ variables: { name } });
     }
-  }, [searchParams]); // Re-run this effect when the query parameters change
+  }, [searchParams]);
 
   return (
     <div

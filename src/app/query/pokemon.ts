@@ -1,6 +1,5 @@
-// src/pokemonQuery.ts
 import { gql } from '@apollo/client';
-import client from '../api/apollo-client'; // Adjust the path if necessary
+import client from '../api/apollo-client';
 import { useLazyQuery } from '@apollo/client';
 
 export const GET_POKEMON = gql`
