@@ -7,7 +7,7 @@ import { usePokemonQuery } from "./query/pokemon";
 const PokemonSearch: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [pokemonName, setPokemonName] = useState("");
+  const [pokemonName, setPokemonName] = useState<string>("");
   const [getPokemon, { loading, error, data }] = usePokemonQuery();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -29,7 +29,7 @@ const PokemonSearch: React.FC = () => {
       setPokemonName(name);
       getPokemon({ variables: { name } });
     }
-  }, [searchParams]);
+  }, [searchParams, getPokemon]);
 
   return (
     <div
