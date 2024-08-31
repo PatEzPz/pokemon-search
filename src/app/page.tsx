@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { usePokemonQuery } from "./query/pokemon"; // Adjust path if necessary
 
 const PokemonSearch: React.FC = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [pokemonName, setPokemonName] = useState("");
   const [getPokemon, { loading, error, data }] = usePokemonQuery();
 
@@ -14,17 +15,23 @@ const PokemonSearch: React.FC = () => {
     if (pokemonName) {
       // Update URL query parameter
       router.push(`/?name=${pokemonName}`);
-      // Perform the query
-      await getPokemon({ variables: { name: pokemonName } });
     }
   };
 
   const handleEvolutionClick = (evolutionName: string) => {
     setPokemonName(evolutionName);
     router.push(`/?name=${evolutionName}`);
-    // Perform the query after setting the evolution name
-    getPokemon({ variables: { name: evolutionName } });
   };
+
+  useEffect(() => {
+    // Get the current query parameter from the URL
+    const name = searchParams.get("name");
+
+    if (name) {
+      setPokemonName(name);
+      getPokemon({ variables: { name } });
+    }
+  }, [searchParams]); // Re-run this effect when the query parameters change
 
   return (
     <div
@@ -156,7 +163,7 @@ const PokemonSearch: React.FC = () => {
                       cursor: "pointer",
                       color: "blue",
                       textDecoration: "underline",
-                      display: "inline-block"
+                      display: "inline-block",
                     }}
                   >
                     {evolution.name}
