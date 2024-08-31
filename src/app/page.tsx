@@ -35,7 +35,7 @@ const PokemonSearch: React.FC = () => {
           value={pokemonName}
           onChange={(e) => setPokemonName(e.target.value)}
           placeholder="Enter Pokémon name"
-          style={{ padding: '10px', fontSize: '16px', width: '200px' }}
+          style={{ padding: '10px', fontSize: '16px', width: '200px', color: 'black' }}
         />
         <button
           type="submit"
