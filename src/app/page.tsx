@@ -3,8 +3,8 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePokemonQuery } from './query/pokemon';
-import PokemonForm from './component/pokemonForm';
-import PokemonInfo from './component/pokemonInfo';
+import PokemonForm from './component/pokemonform';
+import PokemonInfo from './component/pokemoninfo';
 
 const PokemonSearch: React.FC = () => {
   const router = useRouter();
