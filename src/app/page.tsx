@@ -7,20 +7,31 @@ import { usePokemonQuery } from "./query/pokemon";
 const PokemonSearch: React.FC = () => {
   const router = useRouter();
   const [pokemonName, setPokemonName] = useState<string>("");
+  const [pokemonData, setPokemonData] = useState<any>(null);
   const [getPokemon, { loading, error, data }] = usePokemonQuery();
+
+  const fetchPokemonData = async (name: string) => {
+    try {
+      const response = await getPokemon({ variables: { name } });
+      setPokemonData(response.data.pokemon);
+    } catch (err) {
+      console.error("Error fetching Pokémon data:", err);
+      setPokemonData(null);
+    }
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (pokemonName) {
       router.push(`/?name=${pokemonName}`);
-      getPokemon({ variables: { name: pokemonName } });
+      await fetchPokemonData(pokemonName);
     }
   };
 
-  const handleEvolutionClick = (evolutionName: string) => {
+  const handleEvolutionClick = async (evolutionName: string) => {
     setPokemonName(evolutionName);
     router.push(`/?name=${evolutionName}`);
-    getPokemon({ variables: { name: evolutionName } });
+    await fetchPokemonData(evolutionName);
   };
 
   const fetchPokemonFromURL = () => {
@@ -29,9 +40,10 @@ const PokemonSearch: React.FC = () => {
 
     if (name) {
       setPokemonName(name);
-      getPokemon({ variables: { name } });
+      fetchPokemonData(name);
     } else {
       setPokemonName("");
+      setPokemonData(null);
     }
   };
 
@@ -39,13 +51,7 @@ const PokemonSearch: React.FC = () => {
     fetchPokemonFromURL();
 
     const handlePopState = () => {
-      const query = new URLSearchParams(window.location.search);
-      const name = query.get("name");
-      if (!name) {
-        window.location.reload();
-      } else {
-        fetchPokemonFromURL();
-      }
+      fetchPokemonFromURL();
     };
 
     window.addEventListener("popstate", handlePopState);
@@ -101,10 +107,10 @@ const PokemonSearch: React.FC = () => {
         </div>
         {loading && <p>Loading...</p>}
         {error && <p>Error: {error.message}</p>}
-        {data && data.pokemon && (
+        {pokemonData && (
           <div>
             <h2 style={{ textAlign: "center", marginBottom: "10px" }}>
-              {data.pokemon.name}
+              {pokemonData.name}
             </h2>
             <div
               style={{
@@ -114,8 +120,8 @@ const PokemonSearch: React.FC = () => {
               }}
             >
               <img
-                src={data.pokemon.image}
-                alt={data.pokemon.name}
+                src={pokemonData.image}
+                alt={pokemonData.name}
                 style={{ borderRadius: "15px" }}
               />
             </div>
@@ -131,23 +137,23 @@ const PokemonSearch: React.FC = () => {
                 <h3 style={{ fontWeight: "bold", color: "gray" }}>
                   Information
                 </h3>
-                <p>ID: {data.pokemon.id}</p>
-                <p>Number: {data.pokemon.number}</p>
+                <p>ID: {pokemonData.id}</p>
+                <p>Number: {pokemonData.number}</p>
                 <p>
-                  Weight: {data.pokemon.weight.minimum} -{" "}
-                  {data.pokemon.weight.maximum}
+                  Weight: {pokemonData.weight.minimum} -{" "}
+                  {pokemonData.weight.maximum}
                 </p>
                 <p>
-                  Height: {data.pokemon.height.minimum} -{" "}
-                  {data.pokemon.height.maximum}
+                  Height: {pokemonData.height.minimum} -{" "}
+                  {pokemonData.height.maximum}
                 </p>
-                <p>Classification: {data.pokemon.classification}</p>
-                <p>Types: {data.pokemon.types.join(", ")}</p>
-                <p>Resistant: {data.pokemon.resistant.join(", ")}</p>
-                <p>Weaknesses: {data.pokemon.weaknesses.join(", ")}</p>
-                <p>Flee Rate: {data.pokemon.fleeRate}</p>
-                <p>Max CP: {data.pokemon.maxCP}</p>
-                <p>Max HP: {data.pokemon.maxHP}</p>
+                <p>Classification: {pokemonData.classification}</p>
+                <p>Types: {pokemonData.types.join(", ")}</p>
+                <p>Resistant: {pokemonData.resistant.join(", ")}</p>
+                <p>Weaknesses: {pokemonData.weaknesses.join(", ")}</p>
+                <p>Flee Rate: {pokemonData.fleeRate}</p>
+                <p>Max CP: {pokemonData.maxCP}</p>
+                <p>Max HP: {pokemonData.maxHP}</p>
               </div>
               <div>
                 <h3 style={{ fontWeight: "bold", color: "red" }}>Attacks</h3>
@@ -155,50 +161,42 @@ const PokemonSearch: React.FC = () => {
                   <h4 style={{ fontWeight: "bold", color: "orange" }}>
                     Fast Attacks
                   </h4>
-                  {data.pokemon.attacks.fast.map(
-                    (attack: any, index: number) => (
-                      <p key={index}>
-                        {attack.name} - Type: {attack.type} - Damage:{" "}
-                        {attack.damage}
-                      </p>
-                    )
-                  )}
+                  {pokemonData.attacks.fast.map((attack: any, index: number) => (
+                    <p key={index}>
+                      {attack.name} - Type: {attack.type} - Damage: {attack.damage}
+                    </p>
+                  ))}
                 </div>
                 <div>
                   <h4 style={{ fontWeight: "bold", color: "yellow" }}>
                     Special Attacks
                   </h4>
-                  {data.pokemon.attacks.special.map(
-                    (attack: any, index: number) => (
-                      <p key={index}>
-                        {attack.name} - Type: {attack.type} - Damage:{" "}
-                        {attack.damage}
-                      </p>
-                    )
-                  )}
+                  {pokemonData.attacks.special.map((attack: any, index: number) => (
+                    <p key={index}>
+                      {attack.name} - Type: {attack.type} - Damage: {attack.damage}
+                    </p>
+                  ))}
                 </div>
               </div>
             </div>
-            {data.pokemon.evolutions && (
+            {pokemonData.evolutions && (
               <div style={{ marginTop: "10px" }}>
                 <h3 style={{ fontWeight: "bold", color: "pink" }}>Evolutions</h3>
-                {data.pokemon.evolutions.map(
-                  (evolution: any, index: number) => (
-                    <div key={index}>
-                      <h4
-                        onClick={() => handleEvolutionClick(evolution.name)}
-                        style={{
-                          cursor: "pointer",
-                          color: "blue",
-                          textDecoration: "underline",
-                          display: "inline-block",
-                        }}
-                      >
-                        {evolution.name}
-                      </h4>
-                    </div>
-                  )
-                )}
+                {pokemonData.evolutions.map((evolution: any, index: number) => (
+                  <div key={index}>
+                    <h4
+                      onClick={() => handleEvolutionClick(evolution.name)}
+                      style={{
+                        cursor: "pointer",
+                        color: "blue",
+                        textDecoration: "underline",
+                        display: "inline-block",
+                      }}
+                    >
+                      {evolution.name}
+                    </h4>
+                  </div>
+                ))}
               </div>
             )}
           </div>
