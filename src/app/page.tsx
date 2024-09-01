@@ -1,12 +1,11 @@
 "use client";
 
 import React, { Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { usePokemonQuery } from "./query/pokemon";
 
 const PokemonSearch: React.FC = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [pokemonName, setPokemonName] = useState<string>("");
   const [getPokemon, { loading, error, data }] = usePokemonQuery();
 
@@ -14,22 +13,39 @@ const PokemonSearch: React.FC = () => {
     event.preventDefault();
     if (pokemonName) {
       router.push(`/?name=${pokemonName}`);
+      getPokemon({ variables: { name: pokemonName } });
     }
   };
 
   const handleEvolutionClick = (evolutionName: string) => {
     setPokemonName(evolutionName);
     router.push(`/?name=${evolutionName}`);
+    getPokemon({ variables: { name: evolutionName } });
   };
 
-  useEffect(() => {
-    const name = searchParams.get("name");
+  const fetchPokemonFromURL = () => {
+    const query = new URLSearchParams(window.location.search);
+    const name = query.get("name");
 
     if (name) {
       setPokemonName(name);
       getPokemon({ variables: { name } });
     }
-  }, [searchParams, getPokemon]);
+  };
+
+  useEffect(() => {
+    fetchPokemonFromURL();
+
+    const handlePopState = () => {
+      fetchPokemonFromURL();
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [getPokemon]);
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
