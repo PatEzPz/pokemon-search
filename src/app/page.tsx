@@ -30,6 +30,8 @@ const PokemonSearch: React.FC = () => {
     if (name) {
       setPokemonName(name);
       getPokemon({ variables: { name } });
+    } else {
+      setPokemonName("");
     }
   };
 
@@ -37,7 +39,13 @@ const PokemonSearch: React.FC = () => {
     fetchPokemonFromURL();
 
     const handlePopState = () => {
-      fetchPokemonFromURL();
+      const query = new URLSearchParams(window.location.search);
+      const name = query.get("name");
+      if (!name) {
+        window.location.reload();
+      } else {
+        fetchPokemonFromURL();
+      }
     };
 
     window.addEventListener("popstate", handlePopState);
